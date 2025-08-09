@@ -140,21 +140,21 @@ int main(int argc, char **argv) {
 	struct timespec start;
 	struct timespec end;
 
-        fillMatrixRandoms(A, N);
-        fillMatrixRandoms(B, N);
+    fillMatrixRandoms(A, N);
+    fillMatrixRandoms(B, N);
 
 	FILE *out = fopen("timings.csv", "a");
-        if(!out) {
-                fprintf(stderr, "Couldn't open file!\n");
-                exit(1);
-        }
+    if(!out) {
+        fprintf(stderr, "Couldn't open file!\n");
+        exit(1);
+    }
 
 	int i;
 	for(i = 0; i < repetition; i++) {
 		fillMatrixZeros(naiveResult, N);
 		fillMatrixZeros(cachedResult, N);
 
-	        clock_gettime(CLOCK_MONOTONIC, &start);
+	    clock_gettime(CLOCK_MONOTONIC, &start);
 		naiveMatMul(A, B, naiveResult, N);
 		clock_gettime(CLOCK_MONOTONIC, &end);
 		double naiveTime = timeDiff(&start, &end);
@@ -162,7 +162,7 @@ int main(int argc, char **argv) {
 		fprintf(out, "%s,%d,%s,%.6f\n", VECTORIZE, N, "naive", naiveTime);
 
 		clock_gettime(CLOCK_MONOTONIC, &start);
-	        cachedMatMul(A, B, cachedResult, N, blockSize);
+	    cachedMatMul(A, B, cachedResult, N, blockSize);
 		clock_gettime(CLOCK_MONOTONIC, &end);
 		double cachedTime = timeDiff(&start, &end);
 		printf("Time passed to complete cache-aware (tiling) matrix multiplication: %.6f seconds\n", cachedTime);
