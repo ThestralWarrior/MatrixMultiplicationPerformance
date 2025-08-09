@@ -1,5 +1,5 @@
-#ifndef VECTYPE
-#define VECTYPE "none"
+#ifndef VECTORIZE
+#define VECTORIZE "disabled"
 #endif
 
 #include <stdio.h>
@@ -40,9 +40,34 @@ double **alloc2DMatrix(int N) {
 	return matrix;
 }
 
+double **alloc2DMatrixAligned(int N) {
+	double **matrix = (double **)malloc(N * sizeof(double *));
+	if(!matrix) {
+		fprintf(stderr, "malloc failed!\n");
+		exit(1);
+	}
+
+	double *data;
+	if(posix_memalign((void **)&data, 64, N * N * sizeof(double))) {
+		fprintf(stderr, "posix_memalign failed!\n");
+		exit(1);
+	}
+
+	for(int i = 0; i < N; i++)
+		matrix[i] = &data[i * N];
+
+	return matrix;
+
+}
+
 void free2DMatrix(double **matrix, int N) {
 	for(int i = 0; i < N; i++)
 		free(matrix[i]);
+	free(matrix);
+}
+
+void free2DMatrixAligned(double **matrix, int N) {
+	free(matrix[0]);
 	free(matrix);
 }
 
@@ -78,7 +103,8 @@ void cachedMatMul(double **A, double **B, double **C, int N, int blockSize) {
 int checkMatrixEquality(double **A, double **B, int N) {
 	for(int i = 0; i < N; i++)
 		for(int j = 0; j < N; j++)
-			if (fabs(A[i][j] - B[i][j]) < EPSILON) return 0;
+			if (fabs(A[i][j] - B[i][j]) > EPSILON)
+				return 0;
 	return 1;
 }
 
@@ -89,27 +115,27 @@ int main(int argc, char **argv) {
 		N = atoi(argv[1]);
 		if(N <= 0) {
 			fprintf(stderr, "Invalid matrix size!\n");
-			return 1;
+			exit(1);
 		}
 		if(argc == 3) {
 			repetition = atoi(argv[2]);
 			if(N <= 0) {
 				fprintf(stderr, "Invalid repetition number!\n");
-				return 1;
+				exit(1);
 			}
 		}
 	}
 	
-	printf("Vectorization: %s\n", VECTYPE);	
+	printf("Vectorization: %s\n", VECTORIZE);	
 
 	int blockSize = determineOptimalBlockSize(N);
 	printf("Optimal block size: %d\n", blockSize);
 
 
-	double **A = alloc2DMatrix(N);
-	double **B = alloc2DMatrix(N);
-	double **naiveResult = alloc2DMatrix(N);
-	double **cachedResult = alloc2DMatrix(N);
+	double **A = alloc2DMatrixAligned(N);
+	double **B = alloc2DMatrixAligned(N);
+	double **naiveResult = alloc2DMatrixAligned(N);
+	double **cachedResult = alloc2DMatrixAligned(N);
 
 	struct timespec start;
 	struct timespec end;
@@ -120,7 +146,7 @@ int main(int argc, char **argv) {
 	FILE *out = fopen("timings.csv", "a");
         if(!out) {
                 fprintf(stderr, "Couldn't open file!\n");
-                return 1;
+                exit(1);
         }
 
 	int i;
@@ -133,22 +159,22 @@ int main(int argc, char **argv) {
 		clock_gettime(CLOCK_MONOTONIC, &end);
 		double naiveTime = timeDiff(&start, &end);
 		printf("Time passed to complete naive matrix multiplication: %.6f seconds\n", naiveTime);
-		fprintf(out, "%s,%d,%s,%.6f\n", VECTYPE, N, "naive", naiveTime);
+		fprintf(out, "%s,%d,%s,%.6f\n", VECTORIZE, N, "naive", naiveTime);
 
 		clock_gettime(CLOCK_MONOTONIC, &start);
 	        cachedMatMul(A, B, cachedResult, N, blockSize);
 		clock_gettime(CLOCK_MONOTONIC, &end);
 		double cachedTime = timeDiff(&start, &end);
 		printf("Time passed to complete cache-aware (tiling) matrix multiplication: %.6f seconds\n", cachedTime);
-		fprintf(out, "%s,%d,%s,%.6f\n", VECTYPE, N, "cached", cachedTime);
+		fprintf(out, "%s,%d,%s,%.6f\n", VECTORIZE, N, "cached", cachedTime);
 	}
 
 	fclose(out);
 
-	free2DMatrix(A, N);
-	free2DMatrix(B, N);
-	free2DMatrix(naiveResult, N);
-	free2DMatrix(cachedResult, N);
+	free2DMatrixAligned(A, N);
+	free2DMatrixAligned(B, N);
+	free2DMatrixAligned(naiveResult, N);
+	free2DMatrixAligned(cachedResult, N);
 
 	return 0;
 }
