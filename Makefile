@@ -1,20 +1,16 @@
 CC = gcc
-CFLAGS = -lm
+CFLAGS =
 
-VECFLAGS = 
-
-ifeq ($(VEC),sse)
-	VECFLAGS = -msse4.2 -DVECTYPE=\"sse\"
-else ifeq ($(VEC),avx)
-	VECFLAGS = -mavx -DVECTYPE=\"avx\"
-else ifeq ($(VEC),avx2)
-	VECFLAGS = -mavx2 -mfma -DVECTYPE=\"avx2\"
+ifeq ($(VEC),enabled)
+	CFLAGS += -DVECTORIZE=\"enabled\" -O3 -march=native
 else
-	VECFLAGS = -DVECTYPE=\"none\"
-endif	
+	CFLAGS += -DVECTORIZE=\"disabled\"
+endif
+
+CFLAGS += -lm
 
 all:
-	$(CC) -o matrixmul matrixmul.c $(VECFLAGS) $(CFLAGS)
+	$(CC) -o matrixmul matrixmul.c $(CFLAGS)
 
 clean:
 	rm -f matrixmul
