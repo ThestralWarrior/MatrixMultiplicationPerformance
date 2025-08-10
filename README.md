@@ -27,8 +27,8 @@ where
 - A[i][k]: ✅ good cache behavior (row-wise memory access)
 - B[k][j]: ⚠️ bad cache behavior (column-wise memory access)
 
-In row-wise memory access, the elements are likely to exist in the cache which lead to higher cache hits, whereas in column-wise memory access,
-cache misses occur which require a new cache line of elements to be fetched from main memory. This results in a drop in performance.
+In row-wise memory access, the elements are likely to exist in the cache which leads to higher cache hit rates, whereas in column-wise memory access,
+cache misses occur which requires a new cache line to be fetched from main memory. This results in a drop in performance.
 
 To overcome the poor cache behavior in the naïve approach, the cache-tiling method is used.
 In this method, each matrix is divided into smaller submatrices (called tiles or blocks).
@@ -68,6 +68,18 @@ $$
 \text{blockSize} \leq \sqrt{\left(\frac{L_1}{24}\right)}
 $$
 
+## Benchmark Plots
+### Matrix Dimension (N) = 128
+![N = 128](benchmarks/timings_N128.png)
+### Matrix Dimension (N) = 256
+![N = 256](benchmarks/timings_N256.png)
+### Matrix Dimension (N) = 512
+![N = 512](benchmarks/timings_N512.png)
+### Matrix Dimension (N) = 1024
+![N = 1024](benchmarks/timings_N1024.png)
+### Matrix Dimension(N) = 2048
+![N = 2048](benchmarks/timings_N2048.png)
+
 ## Usage
 ### Build the program:
 Default (vectorization: disabled)
@@ -79,7 +91,8 @@ make
 Specify vectorization enabled/disabled
 
 ```
-make VEC=enabled/disabled
+make VEC=enabled    # Enable vectorization
+make VEC=disabled   # Disable vectorization
 ```
 
 ### Run the program
@@ -117,7 +130,7 @@ pip install matplotlib pandas
 python3 plot_timings.py
 ```
 
-## System Specfications
+## System Specifications
 
 The results present under `benchmarks` folder were generated on the following configuration:
 - `OS`: Ubuntu 24.04.2 LTS x86_64
