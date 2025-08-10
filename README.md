@@ -81,6 +81,7 @@ $$
 ![N = 2048](benchmarks/timings_N2048.png)
 
 ## ⚙️ Usage
+❗ GCC is required
 ### Build the program:
 Default (vectorization: disabled)
 
