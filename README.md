@@ -138,3 +138,5 @@ The results present under `benchmarks` folder were generated on the following co
 - `CPU`: 12th Gen Intel i5-1235U (12) @ 4.400GHz
 - `Memory`: 15716MiB (16GB RAM)
 - `Power Mode`: Performance
+- `GCC`: 13.3.0
+
