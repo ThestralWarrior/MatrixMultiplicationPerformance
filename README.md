@@ -1,9 +1,9 @@
-# Matrix Multiplication Performance Benchmark
+# 👨🏻‍💻 Matrix Multiplication Performance Benchmark
 
 This project benchmarks naïve and cache-aware (tiled) matrix multiplication in C, with optional vectorization support.
 It measures performance for various matrix sizes and parameters, then logs results to a CSV file for further analysis.
 
-## Overview
+## 📝 Overview
 
 Matrix multiplication can be implemented in different ways with varying performance characteristics.
 
@@ -17,7 +17,7 @@ The program:
 - Can run in vectorized or non-vectorized mode (controlled at compile time).
 - Outputs timing results in both console and `timings.csv`.
 
-## Why cache-tiling?
+## 👀 Why cache-tiling?
 
 The Naïve method relies on a triple-nested loop which accesses memory according to the formula:
 ```
@@ -42,7 +42,7 @@ significantly improving performance for large matrices that do not fit entirely 
 
 However, the Naïve method works faster than the Cache-aware method when it comes to smaller matrices.
 
-## Determining the block size
+## 🎯 Determining the block size
 
 The block size is chosen to maximize cache utilization by ensuring that the data involved in each block multiplication fits within the CPU’s L1 data cache.
 Specifically, for each block multiplication step, we load three blocks into cache simultaneously: one block from matrix A, one from B, and one from C.
@@ -68,7 +68,7 @@ $$
 \text{blockSize} \leq \sqrt{\left(\frac{L_1}{24}\right)}
 $$
 
-## Benchmark Plots
+## 📊 Benchmark Plots
 ### Matrix Dimension (N) = 128
 ![N = 128](benchmarks/timings_N128.png)
 ### Matrix Dimension (N) = 256
@@ -80,7 +80,7 @@ $$
 ### Matrix Dimension(N) = 2048
 ![N = 2048](benchmarks/timings_N2048.png)
 
-## Usage
+## ⚙️ Usage
 ### Build the program:
 Default (vectorization: disabled)
 
@@ -130,10 +130,11 @@ pip install matplotlib pandas
 python3 plot_timings.py
 ```
 
-## System Specifications
+## 💻⚙️ System Specifications
 
 The results present under `benchmarks` folder were generated on the following configuration:
 - `OS`: Ubuntu 24.04.2 LTS x86_64
 - `Kernel`: 6.14.0-24-generic
 - `CPU`: 12th Gen Intel i5-1235U (12) @ 4.400GHz
-- `Memory`: 15716MiB (16GB RAM) 
+- `Memory`: 15716MiB (16GB RAM)
+- `Power Mode`: Performance
